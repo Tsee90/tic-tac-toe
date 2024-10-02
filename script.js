@@ -2,6 +2,7 @@ const gameboard = (function(){
     let a = [null, null, null];
     let b = [null, null, null];
     let c = [null, null, null];
+
     const place = (x, y, player) => {
         if(isOpen(x, y)){
             let piece = '';
@@ -22,7 +23,11 @@ const gameboard = (function(){
                     break;
             }
         }
+        if(isWinner()){
+            console.log('Player ' + player + ' wins!');
+        }
     }
+
     const isOpen = (x, y) => {
         switch (x){
             case 'a':
@@ -45,6 +50,25 @@ const gameboard = (function(){
                 }
         }
     }
+
+    const isWinner = () => {
+        if(
+            a[0] === a[1] && a[0] === a[2] && a[0] !== null ||
+            b[0] === b[1] && b[0] === b[2] && b[0] !== null ||
+            c[0] === c[1] && c[0] === c[2] && c[0] !== null ||
+            a[0] === b[0] && a[0] === c[0] && a[0] !== null ||
+            a[1] === b[1] && a[1] === c[1] && a[1] !== null ||
+            a[2] === b[2] && a[2] === c[2] && a[2] !== null ||
+            a[0] === b[1] && a[0] === c[2] && a[0] !== null ||
+            a[2] === b[1] && a[2] === c[0] && a[2] !== null 
+        ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     const log = () => console.log(a + b + c);
+
     return {place, log}
 })();
