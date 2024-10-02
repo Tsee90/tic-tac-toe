@@ -1,26 +1,56 @@
-const gameboard = (function(){
-    let gameArray = [
-        '', '', '',
-        '', '', '',
-        '', '', ''
-    ];
-    const place = (index, symbol) => {
-        gameArray[index] = symbol;
+const players = (function(){
+    const createPlayer = (name, number, turn) => {
+        return {name, number, turn}
     }
-    const get = () => gameArray;
-    return {place, get}
+    firstPlayer = createPlayer('Player 1', '1', true);
+    secondPlayer = createPlayer('Player 2', '2', false);
+    
+    const changeName = (newName, number) => {
+        if (number === '1'){
+            firstPlayer.name = newName;
+        }else{
+            secondPlayer.name = newName;
+        }
+    }
+
+    const changeTurn = () => {
+        if(firstPlayer.turn === true){
+            firstPlayer.turn = false;
+            secondPlayer.turn = true;
+        }else{
+            secondPlayer.turn = false;
+            firstPlayer.turn = true;
+        }
+    }
+
+    const checkTurn = () => {
+        if(firstPlayer.turn === true){
+            return '1';
+        }else{
+            return '2';
+        }
+    }
+
+    const resetTurn = () => {
+        firstPlayer.turn = true;
+        secondPlayer.turn = false;
+    }
+
+    const getPlayerName = (number) => {
+        if(number === '1'){
+            return firstPlayer.name;
+        }else{
+            return secondPlayer.name;
+        }
+    }
+
+    const getPlayers = () => [firstPlayer, secondPlayer];
+
+    return {changeName, getPlayers, getPlayerName, changeTurn, checkTurn, resetTurn}
 })();
 
-function createPlayer(name, number) {
-    const changeName = (newName) => {name = newName}
-    const getName = () => name;
-    const getNumber = () => number;
-    return {changeName, getName, getNumber}
-}
+const game = (function(){
 
-const game = (function (){
-    let turn = '1';
-    
     const checkOpen = (index) => {
         const arr = gameboard.get();
         if (arr[index] === ''){
@@ -58,54 +88,71 @@ const game = (function (){
         return tie;
     }
 
-    const getTurn = () => {
-        return turn;
-    }
-
     const play = (index) => {
-        let piece = '';
-        if (turn === '1') {
-            piece = 'X';
-        }else{
-            piece = 'O';
-        }
-    
         if (checkOpen(index)){
-            gameboard.place(index, piece);
+            
+            gameboard.place(index);
             if (checkWin()){
-                console.log(turn + ' Wins!');
+                if(players.checkTurn() === '1'){
+                    alert(players.getPlayerName('1') + ' Wins!');
+                }else{
+                    alert(players.getPlayerName('2') +  'Wins!');
+                }
+                gameboard.reset();
             }else if(checkTie()){
                 console.log('TIE!');
             }
+            players.changeTurn();
             console.log(gameboard.get());
-            if (turn === '1'){
-                turn = '2';
-            }else{
-                turn = '1';
-            }
         }
     }
-    return {play, checkOpen, getTurn}
+    return {play}
 })();
 
-const initialize = (function(){
-    const player1 = createPlayer('Player 1', '1');
-    const player2 = createPlayer('Player 2', '2');
+const gameboard = (function(){
+    let gameArray = [
+        '', '', '',
+        '', '', '',
+        '', '', ''
+    ];
+
     const boardGrid = document.querySelector('#board-grid');
-
-    const createTiles = () => {
-        for (let i = 0; i < 9; i++){
-            const tile = document.createElement('div');
-            tile.value = i.toString();
-            tile.className = 'tile';
-            tile.addEventListener('click', (event) => {
-                const index = event.target.value;  
-                game.play(index);                  
-            });
-            boardGrid.appendChild(tile);
-        }
-        
+    for (let i = 0; i < 9; i++){
+        const tile = document.createElement('div');
+        tile.value = i.toString();
+        tile.className = 'tile';
+        tile.addEventListener('click', (event) => {
+            game.play(event.target.value);
+        });
+        boardGrid.appendChild(tile);
     }
-    createTiles();
-})();
+    const tileList = boardGrid.querySelectorAll('.tile');
 
+    const place = (index) => {
+        if(players.checkTurn() === '1'){
+            gameArray[index] = 'X';
+        }else{
+            gameArray[index] = 'O';
+        }
+        render();
+    }
+
+    const render = () => {
+        tileList.forEach((tile, index) => {
+            tile.textContent = gameArray[index];
+        });
+    }
+
+    const reset = () => {
+        gameArray.forEach((item) => {
+            item = '';
+        });
+        tileList.forEach((tile) => {
+            tile.textContent = '';
+        });
+        players.resetTurn();
+    }
+
+    const get = () => gameArray;
+    return {place, get, reset}
+})();
