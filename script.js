@@ -13,14 +13,24 @@ const players = (function(){
         if(nearestDiv.contentEditable === 'false'){
             nearestDiv.contentEditable = 'true';
             event.target.textContent = 'Save'
+            nearestDiv.focus();
         }else{
             nearestDiv.contentEditable = 'false';
             event.target.textContent = 'Edit';
-            if (event.target.id === 'player-one-button'){
-                firstPlayer.name = nearestDiv.textContent;
-            }else{
-                secondPlayer.name = nearestDiv.textContent;
+            let newName = nearestDiv.textContent;
+            if (newName.length > 18){
+                newName = newName.slice(0, 18) + '...';
             }
+            if (event.target.id === 'player-one-button'){
+                firstPlayer.name = newName;
+            }else{
+                secondPlayer.name = newName;
+            }
+            
+            if (newName.length > 9){
+                newName = newName.slice(0, 9);
+            }
+            nearestDiv.textContent = newName;
         }
     }
 
@@ -71,10 +81,20 @@ const players = (function(){
     let firstPlayerDisplay = document.querySelector('#player-one');
     let secondPlayerDisplay = document.querySelector('#player-two');
     render();
-    const editPlayerOne = document.querySelector('#player-one-button');
-    const editPlayerTwo = document.querySelector('#player-two-button');
-    editPlayerOne.addEventListener('click', (event) => {editButton(event)});
-    editPlayerTwo.addEventListener('click', (event) => {editButton(event)});
+    const editButtons = document.querySelectorAll('.edit-name');
+    editButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {editButton(event)});
+    })
+    const playerDivs = document.querySelectorAll('.player-name');
+    playerDivs.forEach((div) => {
+        div.addEventListener('keydown', (event) => {
+            if(div.contentEditable === 'true' && event.key === 'Enter'){
+                let nearestButton = event.target.nextElementSibling || event.target.previousElementSibling;
+                nearestButton.click();
+                div.blur();
+            }
+        });
+    });
 
     return {changeName, getPlayers, getPlayerName, changeTurn, checkTurn, resetTurn}
 })();
@@ -109,18 +129,22 @@ const gameboard = (function(){
 
     const on = () => {
         tileList.forEach((tile) => {
-            tile.addEventListener('click', click); 
+            tile.addEventListener('click', clickTile); 
+            tile.classList.remove('gray-out');
         });
+        boardGrid.classList.remove('gray-out');
     }
 
     const off = () => {
-        alert('we here')
         tileList.forEach((tile) => {
-            tile.removeEventListener('click', click);
+            tile.removeEventListener('click', clickTile);
+            tile.classList.add('gray-out');
         });
+        boardGrid.classList.add('gray-out');
+    
     }
 
-    const click = (event) => {
+    const clickTile = (event) => {
         game.play(event.target.value);
     }
 
@@ -143,7 +167,7 @@ const gameboard = (function(){
     }
     const tileList = boardGrid.querySelectorAll('.tile');
     on();
-    
+
     return {place, get, reset, getGrid, on, off}
 })();
 
@@ -192,11 +216,11 @@ const game = (function(){
             gameboard.place(index);
             if (checkWin()){
                 if(players.checkTurn() === '1'){
-                    displayOutcome.textContent = players.getPlayerName('1') + ' Wins!'
+                    displayOutcome.innerHTML = players.getPlayerName('1') + '<br>Wins!'
                     boardGrid.appendChild(endScreen);
                     gameboard.off();
                 }else{
-                    displayOutcome.textContent = players.getPlayerName('2') + ' Wins!'
+                    displayOutcome.innerHTML = players.getPlayerName('2') + '<br>Wins!'
                     boardGrid.appendChild(endScreen);
                     gameboard.off();
                 }
@@ -213,15 +237,16 @@ const game = (function(){
     endScreen.id = 'end-screen';
     const displayOutcome = document.createElement('div');
     displayOutcome.id = 'display-outcome';
-    const resetButton = document.createElement('button');
-    resetButton.textContent = 'Reset';
-    resetButton.addEventListener('click', () => {
+    const retryButton = document.createElement('button');
+    retryButton.id = 'retry';
+    retryButton.textContent = 'Retry';
+    retryButton.addEventListener('click', () => {
         gameboard.reset();
         boardGrid.removeChild(endScreen);
         gameboard.on();
     });
     endScreen.appendChild(displayOutcome);
-    endScreen.appendChild(resetButton);
+    endScreen.appendChild(retryButton);
     const boardGrid = gameboard.getGrid();
 
     return {play}

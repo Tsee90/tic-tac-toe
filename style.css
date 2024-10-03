@@ -7,17 +7,115 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+}
+
+#wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
 }
 
 #board-grid {
     display: grid;
     grid-template: repeat(3, 200px) / repeat(3, 200px);
-    background-color: blue;
+    background-color: white;
+    border: 5px solid black;
+    position: relative;
 }
 
-#board-grid .tile {
-    background-color: red;
+.tile {
+    box-sizing: border-box;
+    background-color: white;
+    border: 1px solid black;
     height: 100%;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 100px;
+    font-weight: bold;
+}
 
+#board-grid.gray-out {
+    background-color: gray;
+    color: rgb(80, 79, 79);
+}
+
+.tile.gray-out {
+    background-color: gray;
+    border-color: rgb(80, 79, 79);
+    color: rgb(80, 79, 79);
+}
+
+#end-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    height: 75%;
+    width: 75%;
+    background-color: none;
+}
+
+#retry {
+    height: 100px;
+    width: 250px;
+    font-size: 50px;
+    border: 2px solid black;
+}
+
+#display-outcome {
+    font-size: 4.5rem;
+    color: white;
+    text-shadow:
+                -1px -1px 0 black,
+                 1px -1px 0 black,
+                -1px  1px 0 black,
+                 1px  1px 0 black;
+    text-align: center;
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
+.player-div {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px ridge black;
+    height: 2.1rem;
+    width: 200px;
+}
+
+#player-one-container {
+    justify-content: right;
+    
+}
+
+#player-two-container {
+    justify-content: left;
+}
+
+.player-name {
+    box-sizing: border-box;
+    font-size: 1.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    max-height: 2.1rem;
+}
+
+.player-name:focus {
+    outline: none;
+}
+
+.edit-name {
+    height: 100%;
+    border-style: none;
+    min-width: 50px;
 }
