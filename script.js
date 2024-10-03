@@ -2,9 +2,40 @@ const players = (function(){
     const createPlayer = (name, number, turn) => {
         return {name, number, turn}
     }
+    
+    const render = () => {
+        firstPlayerDisplay.textContent = firstPlayer.name;
+        secondPlayerDisplay.textContent = secondPlayer.name;
+    }
+   
+    const editButton = (event) => {
+        let nearestDiv = event.target.nextElementSibling || event.target.previousElementSibling;
+        alert(event.target.id)
+        let currentName = nearestDiv.textContent;
+        if(nearestDiv.contentEditable === 'false'){
+            nearestDiv.contentEditable = 'true';
+            event.target.textContent = 'Save'
+        }else{
+            nearestDiv.contentEditable = 'false';
+            event.target.textContent = 'Edit';
+            if (event.target.id === 'player-one-button'){
+                firstPlayer.name = nearestDiv.textContent;
+            }else{
+                secondPlayer.name = nearestDiv.textContent;
+            }
+        }
+    }
     firstPlayer = createPlayer('Player 1', '1', true);
     secondPlayer = createPlayer('Player 2', '2', false);
-    
+
+    let firstPlayerDisplay = document.querySelector('#player-one');
+    let secondPlayerDisplay = document.querySelector('#player-two');
+    render();
+    const editPlayerOne = document.querySelector('#player-one-button');
+    const editPlayerTwo = document.querySelector('#player-two-button');
+    editPlayerOne.addEventListener('click', (event) => {editButton(event)});
+    editPlayerTwo.addEventListener('click', (event) => {editButton(event)});
+
     const changeName = (newName, number) => {
         if (number === '1'){
             firstPlayer.name = newName;
@@ -144,9 +175,11 @@ const gameboard = (function(){
     }
 
     const reset = () => {
-        gameArray.forEach((item) => {
-            item = '';
-        });
+        gameArray = [
+            '', '', '',
+            '', '', '',
+            '', '', ''
+        ];
         tileList.forEach((tile) => {
             tile.textContent = '';
         });
