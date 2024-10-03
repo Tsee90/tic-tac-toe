@@ -61,9 +61,13 @@ const players = (function(){
         if(firstPlayer.turn === true){
             firstPlayer.turn = false;
             secondPlayer.turn = true;
+            firstPlayerContainer.classList.remove('turn');
+            secondPlayerContainer.classList.add('turn');
         }else{
             secondPlayer.turn = false;
             firstPlayer.turn = true;
+            firstPlayerContainer.classList.add('turn');
+            secondPlayerContainer.classList.remove('turn');
         }
     }
 
@@ -78,6 +82,8 @@ const players = (function(){
     const resetTurn = () => {
         firstPlayer.turn = true;
         secondPlayer.turn = false;
+        firstPlayerContainer.classList.add('turn');
+        secondPlayerContainer.classList.remove('turn');
     }
 
     const getPlayerName = (number) => {
@@ -94,6 +100,8 @@ const players = (function(){
     let secondPlayer = null;
     let firstPlayerDisplay = null;
     let secondPlayerDisplay = null;
+    let firstPlayerContainer = null;
+    let secondPlayerContainer = null;
     //Initialize variables and event handlers
     const init = (function (){
         firstPlayer = createPlayer('Player 1', '1', true);
@@ -101,6 +109,9 @@ const players = (function(){
 
         firstPlayerDisplay = document.querySelector('#player-one');
         secondPlayerDisplay = document.querySelector('#player-two');
+
+        firstPlayerContainer = document.querySelector('#player-one-container');
+        secondPlayerContainer = document.querySelector('#player-two-container');
 
         const editButtons = document.querySelectorAll('.edit-name');
         editButtons.forEach((button) => {
@@ -111,7 +122,7 @@ const players = (function(){
         playerDivs.forEach((div) => {
             div.addEventListener('keydown', keydownEnter);
         });
-
+        resetTurn();
         render();
     })();
 
@@ -166,6 +177,16 @@ const gameboard = (function(){
         game.play(event.target.value);
     }
 
+    const getTile = (index) => {
+        let sendTile = null;
+        tileList.forEach((tile) => {
+            if (tile.value === index){
+                sendTile = tile;
+            }
+        });
+        return sendTile;
+    }
+
     const getGrid = () => boardGrid;
 
     const get = () => gameArray;
@@ -189,7 +210,7 @@ const gameboard = (function(){
         tileList = boardGrid.querySelectorAll('.tile');
         on();
     })();
-    return {place, get, reset, getGrid, on, off}
+    return {place, get, reset, getGrid, on, off, getTile}
 })();
 
 //Applies functional logic to the game by calling variables from both players and gameboard
@@ -260,6 +281,8 @@ const game = (function(){
                 gameboard.off();
             }
             players.changeTurn();//If no winner or tie
+        }else{
+            error(index);
         }
     }
     //Eventhandler for retry button
@@ -268,11 +291,20 @@ const game = (function(){
         boardGrid.removeChild(endScreen);
         gameboard.on();
     }
+
+    const error = (index) => {
+        tile = gameboard.getTile(index);
+        tile.classList.add('error');
+        setTimeout(() => {
+            tile.classList.remove('error');
+        }, 100);
+    }
+
     //Declare scoped variables
     let endScreen = null;
     let displayOutcome = null;
     let boardGrid = null;
-    //Initialize variables
+    //Initialize variables and event handlers
     const init = (function(){
         endScreen = document.createElement('div');
         endScreen.id = 'end-screen';

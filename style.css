@@ -49,6 +49,10 @@ body {
     color: rgb(80, 79, 79);
 }
 
+.tile.error {
+    background-color: red;
+}
+
 #end-screen {
     position: absolute;
     top: 50%;
@@ -88,7 +92,7 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
-    border: 1px ridge black;
+    border: 3px solid black;
     height: 2.1rem;
     width: 200px;
 }
@@ -102,6 +106,14 @@ body {
     justify-content: left;
 }
 
+#player-one-container.turn {
+    border: 3px ridge rgb(0, 211, 0);
+}
+
+#player-two-container.turn {
+    border: 3px ridge rgb(0, 211, 0);
+}
+
 .player-name {
     box-sizing: border-box;
     font-size: 1.5rem;
@@ -109,6 +121,8 @@ body {
     white-space: nowrap;
     max-height: 2.1rem;
 }
+
+
 
 .player-name:focus {
     outline: none;
