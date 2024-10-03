@@ -10,8 +10,6 @@ const players = (function(){
    
     const editButton = (event) => {
         let nearestDiv = event.target.nextElementSibling || event.target.previousElementSibling;
-        alert(event.target.id)
-        let currentName = nearestDiv.textContent;
         if(nearestDiv.contentEditable === 'false'){
             nearestDiv.contentEditable = 'true';
             event.target.textContent = 'Save'
@@ -25,16 +23,6 @@ const players = (function(){
             }
         }
     }
-    firstPlayer = createPlayer('Player 1', '1', true);
-    secondPlayer = createPlayer('Player 2', '2', false);
-
-    let firstPlayerDisplay = document.querySelector('#player-one');
-    let secondPlayerDisplay = document.querySelector('#player-two');
-    render();
-    const editPlayerOne = document.querySelector('#player-one-button');
-    const editPlayerTwo = document.querySelector('#player-two-button');
-    editPlayerOne.addEventListener('click', (event) => {editButton(event)});
-    editPlayerTwo.addEventListener('click', (event) => {editButton(event)});
 
     const changeName = (newName, number) => {
         if (number === '1'){
@@ -77,7 +65,86 @@ const players = (function(){
 
     const getPlayers = () => [firstPlayer, secondPlayer];
 
+    firstPlayer = createPlayer('Player 1', '1', true);
+    secondPlayer = createPlayer('Player 2', '2', false);
+
+    let firstPlayerDisplay = document.querySelector('#player-one');
+    let secondPlayerDisplay = document.querySelector('#player-two');
+    render();
+    const editPlayerOne = document.querySelector('#player-one-button');
+    const editPlayerTwo = document.querySelector('#player-two-button');
+    editPlayerOne.addEventListener('click', (event) => {editButton(event)});
+    editPlayerTwo.addEventListener('click', (event) => {editButton(event)});
+
     return {changeName, getPlayers, getPlayerName, changeTurn, checkTurn, resetTurn}
+})();
+const gameboard = (function(){
+
+    const place = (index) => {
+        if(players.checkTurn() === '1'){
+            gameArray[index] = 'X';
+        }else{
+            gameArray[index] = 'O';
+        }
+        render();
+    }
+
+    const render = () => {
+        tileList.forEach((tile, index) => {
+            tile.textContent = gameArray[index];
+        });
+    }
+
+    const reset = () => {
+        gameArray = [
+            '', '', '',
+            '', '', '',
+            '', '', ''
+        ];
+        tileList.forEach((tile) => {
+            tile.textContent = '';
+        });
+        players.resetTurn();
+    }
+
+    const on = () => {
+        tileList.forEach((tile) => {
+            tile.addEventListener('click', click); 
+        });
+    }
+
+    const off = () => {
+        alert('we here')
+        tileList.forEach((tile) => {
+            tile.removeEventListener('click', click);
+        });
+    }
+
+    const click = (event) => {
+        game.play(event.target.value);
+    }
+
+    const getGrid = () => boardGrid;
+
+    const get = () => gameArray;
+
+    let gameArray = [
+        '', '', '',
+        '', '', '',
+        '', '', ''
+    ];
+
+    const boardGrid = document.querySelector('#board-grid');
+    for (let i = 0; i < 9; i++){
+        const tile = document.createElement('div');
+        tile.value = i.toString();
+        tile.className = 'tile';
+        boardGrid.appendChild(tile);
+    }
+    const tileList = boardGrid.querySelectorAll('.tile');
+    on();
+    
+    return {place, get, reset, getGrid, on, off}
 })();
 
 const game = (function(){
@@ -125,67 +192,38 @@ const game = (function(){
             gameboard.place(index);
             if (checkWin()){
                 if(players.checkTurn() === '1'){
-                    alert(players.getPlayerName('1') + ' Wins!');
+                    displayOutcome.textContent = players.getPlayerName('1') + ' Wins!'
+                    boardGrid.appendChild(endScreen);
+                    gameboard.off();
                 }else{
-                    alert(players.getPlayerName('2') +  'Wins!');
+                    displayOutcome.textContent = players.getPlayerName('2') + ' Wins!'
+                    boardGrid.appendChild(endScreen);
+                    gameboard.off();
                 }
-                gameboard.reset();
             }else if(checkTie()){
-                console.log('TIE!');
+                displayOutcome.textContent = 'TIE GAME!';
+                boardGrid.appendChild(endScreen);
+                gameboard.off();
             }
             players.changeTurn();
-            console.log(gameboard.get());
         }
     }
+
+    const endScreen = document.createElement('div');
+    endScreen.id = 'end-screen';
+    const displayOutcome = document.createElement('div');
+    displayOutcome.id = 'display-outcome';
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset';
+    resetButton.addEventListener('click', () => {
+        gameboard.reset();
+        boardGrid.removeChild(endScreen);
+        gameboard.on();
+    });
+    endScreen.appendChild(displayOutcome);
+    endScreen.appendChild(resetButton);
+    const boardGrid = gameboard.getGrid();
+
     return {play}
 })();
 
-const gameboard = (function(){
-    let gameArray = [
-        '', '', '',
-        '', '', '',
-        '', '', ''
-    ];
-
-    const boardGrid = document.querySelector('#board-grid');
-    for (let i = 0; i < 9; i++){
-        const tile = document.createElement('div');
-        tile.value = i.toString();
-        tile.className = 'tile';
-        tile.addEventListener('click', (event) => {
-            game.play(event.target.value);
-        });
-        boardGrid.appendChild(tile);
-    }
-    const tileList = boardGrid.querySelectorAll('.tile');
-
-    const place = (index) => {
-        if(players.checkTurn() === '1'){
-            gameArray[index] = 'X';
-        }else{
-            gameArray[index] = 'O';
-        }
-        render();
-    }
-
-    const render = () => {
-        tileList.forEach((tile, index) => {
-            tile.textContent = gameArray[index];
-        });
-    }
-
-    const reset = () => {
-        gameArray = [
-            '', '', '',
-            '', '', '',
-            '', '', ''
-        ];
-        tileList.forEach((tile) => {
-            tile.textContent = '';
-        });
-        players.resetTurn();
-    }
-
-    const get = () => gameArray;
-    return {place, get, reset}
-})();
