@@ -38,6 +38,11 @@ body {
     font-weight: bold;
 }
 
+.tile:hover {
+    cursor: pointer;
+    background-color: rgb(255, 255, 56);
+}
+
 #board-grid.gray-out {
     background-color: gray;
     color: rgb(80, 79, 79);
@@ -72,6 +77,10 @@ body {
     width: 250px;
     font-size: 50px;
     border: 2px solid black;
+}
+
+#retry:hover {
+    background-color: rgb(255, 255, 255);
 }
 
 #display-outcome {
@@ -129,7 +138,13 @@ body {
 }
 
 .edit-name {
+    box-sizing: border-box;
     height: 100%;
     border-style: none;
     min-width: 50px;
+}
+
+.edit-name:hover {
+    background-color: white;
+    border: 1px solid black;
 }
